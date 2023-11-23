@@ -1,0 +1,67 @@
+<div *ngIf="item" class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <div class="text-center">
+          <img class="img-fluid rounded-start"
+               [src]="item.originalImage"
+               [alt]="item.name">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-center mt-5">
+          <button *ngIf="!item.detectedImage && showActions"
+                  (click)="detectObjects(item)"
+                  class="btn btn-secondary" type="button" [disabled]="item.isDetecting">
+            <ng-container *ngIf="!item.isDetecting; else loading">
+              Detect objects
+            </ng-container>
+            <ng-template #loading>
+            <span class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true">
+            </span>
+              Loading...
+            </ng-template>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-4 text-center">
+        <p *ngIf="item.error" class="text-danger">{{item.error.message}}</p>
+        <app-timer *ngIf="item.isDetecting"></app-timer>
+        <img *ngIf="item.detectedImage"
+             class="img-fluid rounded-start"
+             [src]="item.detectedImage"
+             [alt]="'detected - ' + item.name">
+      </div>
+
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">{{item.name}}</h5>
+      <p class="card-text"><small class="text-muted">Size: {{formatBytes(item.size)}}</small></p>
+      <button *ngIf="!item.saved && showActions && item.detectedImage"
+              (click)="saveToLibrary(item)"
+              class="btn btn-secondary" type="button" [disabled]="item.isSaving">
+        <span *ngIf="item.isSaving"
+          class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true">
+            </span>
+        Save to library
+      </button>
+      <button *ngIf="item.saved || !showActions"
+              (click)="removeFromLibrary(item)"
+              class="btn btn-secondary" type="button" [disabled]="item.isDeleting">
+        <span *ngIf="item.isDeleting"
+          class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true">
+            </span>
+        Remove from library
+      </button>
+      <p *ngIf="item.saved" class="text-success">Saved in library</p>
+      <p class="card-text" *ngIf="item.labels"><small class="text-muted">Detected labels:
+        <pre>{{item.labels | json}}</pre>
+      </small></p>
+
+    </div>
+  </div>

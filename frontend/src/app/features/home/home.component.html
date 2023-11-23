@@ -1,6 +1,6 @@
-<h1>Upload images to recognise objects on them</h1>
+<h1 class="mt-5">Upload images to recognise objects on them</h1>
 
-<div class="container mt-2" appDragAndDrop (fileDropped)="onFileDropped($event)">
+<div class="container mt-5" appDragAndDrop (fileDropped)="onFileDropped($event)">
   <input type="file" id="fileDrop" multiple
          (change)="fileBrowseHandler($event.target)"/>
   <svg xmlns="http://www.w3.org/2000/svg" width="63" height="64" viewBox="0 0 63 64">
@@ -20,50 +20,5 @@
 </div>
 
 <div class="mt-3" *ngFor="let item of objectDetections">
-  <div class="card mb-3">
-    <div class="row g-0">
-      <div class="col-md-4">
-        <div class="text-center">
-          <img class="img-fluid rounded-start"
-               [src]="item.originalImage"
-               [alt]="item.name">
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="text-center mt-5">
-          <button (click)="detectObjects(item)"
-                  class="btn btn-secondary" type="button" [disabled]="item.isLoading">
-            <ng-container *ngIf="!item.isLoading; else loading">
-              Detect objects
-            </ng-container>
-            <ng-template #loading>
-            <span class="spinner-border spinner-border-sm"
-                  role="status"
-                  aria-hidden="true">
-            </span>
-              Loading...
-            </ng-template>
-          </button>
-        </div>
-      </div>
-      <div class="col-md-4 text-center">
-        <p *ngIf="item.error" class="text-danger">{{item.error.message}}</p>
-        <app-timer *ngIf="item.isLoading"></app-timer>
-        <img *ngIf="item.detectedImage"
-             class="img-fluid rounded-start"
-             [src]="item.detectedImage"
-             [alt]="'detected - ' + item.name">
-      </div>
-
-    </div>
-    <div class="card-body">
-      <h5 class="card-title">{{item.name}}</h5>
-      <p class="card-text"><small class="text-muted">Size: {{formatBytes(item.size)}}</small></p>
-      <p class="card-text"><small class="text-muted">Detected labels:
-        <pre>{{item.labels | json}}</pre>
-      </small></p>
-
-    </div>
-  </div>
-
+  <app-object-detection-card [item]="item"></app-object-detection-card>
 </div>

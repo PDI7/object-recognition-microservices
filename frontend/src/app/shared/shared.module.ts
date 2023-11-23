@@ -7,6 +7,9 @@ import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import {SanitizerUrlPipe} from "./pipes/sanitizer-url.pipe";
 import {TimerComponent} from "./components/timer/timer.component";
+import {LibraryService} from "./services/library.service";
+import {ObjectDetectionCardComponent} from "./components/object-detection-card/object-detection-card.component";
+import {RouterModule} from "@angular/router";
 
 
 @NgModule({
@@ -19,17 +22,22 @@ import {TimerComponent} from "./components/timer/timer.component";
     FormsModule,
     SanitizerUrlPipe,
     NgOptimizedImage,
-    TimerComponent
+    TimerComponent,
+    ObjectDetectionCardComponent,
+    RouterModule
   ],
   exports: [
     ProgressComponent,
     FormsModule,
+    RouterModule,
     SanitizerUrlPipe,
     NgOptimizedImage,
-    TimerComponent
+    TimerComponent,
+    ObjectDetectionCardComponent
   ],
   providers: [
     ObjectDetectionService,
+    LibraryService
   ]
 })
 export class SharedModule {

@@ -1,0 +1,63 @@
+# TextStore
+# --------------------
+# - one container per pod running the image mongodb
+# - one headless service to access them.
+# - Two persistentVolumeClaims/mounts: textstore-data, and mongo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: objectstore-service
+  labels:
+    app: objectstore
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 27017
+    targetPort: mongodb-port
+  selector:
+    app: objectstore
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: objectstore
+  labels:
+    app: objectstore
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: objectstore
+  template:
+    metadata:
+      labels:
+        app: objectstore
+    spec:
+      containers:
+      - name: objectstore
+        image: mongo
+        ports:
+        - containerPort: 27017
+          name: mongodb-port
+        volumeMounts:
+        - name: objectstore-data
+          mountPath: /data/db
+        - name: mongo-config
+          mountPath: /data/configdb
+  volumeClaimTemplates:
+    - metadata:
+        name: objectstore-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests: 
+            storage: 10Mi
+    - metadata:
+        name: mongo-config
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests: 
+            storage: 5Mi

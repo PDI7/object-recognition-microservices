@@ -1,0 +1,15 @@
+<h1 class="mt-5">Library</h1>
+
+<div class="mt-5" *ngFor="let item of objectDetections">
+  <app-object-detection-card [showActions]="false"
+                             [item]="item">
+  </app-object-detection-card>
+</div>
+
+<div *ngIf="objectDetections.length == 0 && !loading">
+  Library is empty
+</div>
+
+<div *ngIf="loading">
+  Loading...
+</div>

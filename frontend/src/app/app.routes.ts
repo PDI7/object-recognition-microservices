@@ -1,6 +1,6 @@
 import {Routes} from '@angular/router';
 import {HomeComponent} from "./features/home/home.component";
-import {HistoryComponent} from "./features/history/history.component";
+import {LibraryComponent} from "./features/library/library.component";
 
 export const routes: Routes = [
   {
@@ -8,8 +8,8 @@ export const routes: Routes = [
     component: HomeComponent
   },
   {
-    path: 'history',
-    component: HistoryComponent
+    path: 'library',
+    component: LibraryComponent
   },
   {
     path: '**',

@@ -63,7 +63,8 @@ export class ObjectDetectionCardComponent {
   saveToLibrary(item: IObjectDetection) {
     item.isSaving = true
     this.libraryService.saveItem(item).subscribe({
-      next: () => {
+      next: result => {
+        item.id = result.id;
         item.isSaving = false;
         item.saved = true;
         item.error = null;
@@ -76,11 +77,15 @@ export class ObjectDetectionCardComponent {
   }
 
   removeFromLibrary(item: IObjectDetection) {
-        item.isDeleting = true
+    item.isDeleting = true;
     this.libraryService.deleteById(item.id).subscribe({
       next: () => {
-        item.isDetecting = false;
+        item.isDeleting = false;
         item.error = null;
+        if (!this.showActions) {
+          window.location.reload();
+        }
+        item.saved = false;
       }, error: error => {
         console.error(error);
         item.isDeleting = false;

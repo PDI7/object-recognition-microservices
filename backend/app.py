@@ -98,8 +98,15 @@ def get_items():
 
 @app.post("/library")
 def save_item():
-    library.insert_one(request.get_json())
-    return jsonify({"state": "successfully inserted"})
+    body = request.get_json()
+    result = library.insert_one({
+        "name": body['name'],
+        "originalImage": body['originalImage'],
+        "detectedImage": body['detectedImage'],
+        "size": body['size'],
+        "labels": body['labels']
+    })
+    return jsonify({"id": str(result.inserted_id)})
 
 
 @app.delete("/library/<id>")

@@ -1,4 +1,5 @@
 import base64
+import os
 from io import BytesIO
 
 import torch
@@ -13,11 +14,13 @@ from torchvision.utils import draw_bounding_boxes
 
 app = Flask(__name__)
 
+for variable, value in os.environ.items():
+    app.config[variable] = value
+
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-# client = MongoClient("mongo:27017")
-client = MongoClient("localhost", 27017)
+client = MongoClient(app.config['OD_DATABASE_HOST'], int(app.config['OD_DATABASE_PORT']))
 db = client.flask_db
 library = db.library
 

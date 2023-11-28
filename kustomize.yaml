@@ -1,3 +1,105 @@
+# QFStandalone
+# --------------------
+# - Deployment to launch one container of mickesv/qfstandalone in a pod.
+# - Service (type: LoadBalancer) to open up the app to the world (localhost, at least).
+# 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: object-detection-frontend
+  labels:
+    app: object-detection-frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+  selector:
+    app: object-detection-frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: object-detection-frontend
+  labels:
+    app: object-detection-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: object-detection-frontend
+  template:
+    metadata:
+      labels:
+        app: object-detection-frontend
+    spec:
+      containers:
+      - name: object-detection-frontend
+        image: paedi7/object-detection-frontend:v1.0.1
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: object-detection-backend
+  labels:
+    app: object-detection-backend
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 5001
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: object-detection-backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: object-detection-backend
+  labels:
+    app: object-detection-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: object-detection-backend
+  template:
+    metadata:
+      labels:
+        app: object-detection-backend
+    spec:
+      containers:
+      - name: object-detection-backend
+        image: paedi7/object-detection-backend:v1.0.1
+        ports:
+        - containerPort: 5000
+        env:
+          - name: OD_DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: object-detection-config
+                key: OD_DATABASE_HOST
+          - name: OD_DATABASE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: object-detection-config
+                key: OD_DATABASE_PORT
+---
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: object-detection-config
+    labels:
+      data: config
+  data:
+    OD_DATABASE_PORT: "27017"
+    OD_DATABASE_HOST: "mongodb://10.104.83.2"
+---
 # TextStore
 # --------------------
 # - one container per pod running the image mongodb
@@ -7,36 +109,40 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: objectstore-service
+  name: object-detection-mongodb
   labels:
-    app: objectstore
+    app: object-detection-mongodb
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
-  - port: 27017
-    targetPort: mongodb-port
+  - name: http
+    port: 27017
+    targetPort: 27017
+    protocol: TCP
   selector:
-    app: objectstore
+    app: object-detection-mongodb
+  externalIPs:
+  - "10.104.83.2"
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: objectstore
+  name: object-detection-mongodb
   labels:
-    app: objectstore
+    app: object-detection-mongodb
 spec:
   serviceName: mongodb
   replicas: 1
   selector:
     matchLabels:
-      app: objectstore
+      app: object-detection-mongodb
   template:
     metadata:
       labels:
-        app: objectstore
+        app: object-detection-mongodb
     spec:
       containers:
-      - name: objectstore
+      - name: object-detection-mongodb
         image: mongo
         ports:
         - containerPort: 27017

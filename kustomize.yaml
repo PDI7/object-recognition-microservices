@@ -1,8 +1,7 @@
-# QFStandalone
+# Object Detection Frontend
 # --------------------
-# - Deployment to launch one container of mickesv/qfstandalone in a pod.
-# - Service (type: LoadBalancer) to open up the app to the world (localhost, at least).
-# 
+# - Deployment for the paedi7/object-detection-frontend
+# - Service - LoadBalancer to enable access
 ---
 apiVersion: v1
 kind: Service
@@ -40,6 +39,12 @@ spec:
         image: paedi7/object-detection-frontend:v1.0.1
         ports:
         - containerPort: 80
+---
+# Object Detection Backend
+# --------------------
+# - Deployment for the paedi7/object-detection-backend
+# - Service - LoadBalancer to enable access
+# - ConfigMap with DB access configuraton
 ---
 apiVersion: v1
 kind: Service
@@ -90,21 +95,21 @@ spec:
                 name: object-detection-config
                 key: OD_DATABASE_PORT
 ---
-  apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: object-detection-config
-    labels:
-      data: config
-  data:
-    OD_DATABASE_PORT: "27017"
-    OD_DATABASE_HOST: "mongodb://10.104.83.2"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: object-detection-config
+  labels:
+    data: config
+data:
+  OD_DATABASE_PORT: "27017"
+  OD_DATABASE_HOST: "object-detection-mongodb"
 ---
-# TextStore
+# Object Detection MongoDB
 # --------------------
-# - one container per pod running the image mongodb
-# - one headless service to access them.
-# - Two persistentVolumeClaims/mounts: textstore-data, and mongo-config
+# - StatefulSet containing the database
+# - Service to access
+# - Two persistentVolumeClaims/mounts: object-detection-data and mongo-config
 ---
 apiVersion: v1
 kind: Service
@@ -113,7 +118,6 @@ metadata:
   labels:
     app: object-detection-mongodb
 spec:
-  type: NodePort
   ports:
   - name: http
     port: 27017
@@ -121,8 +125,6 @@ spec:
     protocol: TCP
   selector:
     app: object-detection-mongodb
-  externalIPs:
-  - "10.104.83.2"
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -148,13 +150,13 @@ spec:
         - containerPort: 27017
           name: mongodb-port
         volumeMounts:
-        - name: objectstore-data
+        - name: object-detection-data
           mountPath: /data/db
         - name: mongo-config
           mountPath: /data/configdb
   volumeClaimTemplates:
     - metadata:
-        name: objectstore-data
+        name: object-detection-data
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:

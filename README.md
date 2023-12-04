@@ -65,5 +65,23 @@ Due to the scope of this project, not many security aspects have been considered
 - Monitoring and logging: Comprehensive monitoring and logging should be added to detect and respond to security incidents in a timely manner.
 - Authentication and authorisation: Secure login and session management should be added.
 
+## Run app
+Start app:
+> kubectl apply -f .\kustomize.yaml
+
+Stop app:
+> kubectl delete -f .\kustomize.yaml
+
+### Access:
+Frontend:
+
+http://localhost (default port 80)
+
+Backend: 
+
+http://localhost:5001/health
+
+http://localhost:5001/health/db
+
 ## Links
 [Github - object-recognition-microservices](https://github.com/PDI7/object-recognition-microservices)
